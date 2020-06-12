@@ -66,7 +66,10 @@ class Loop:
             exercise.interact()
 
 def main():
-    loop = Loop()
-    loop.run()
+    try:
+        loop = Loop()
+        loop.run()
+    except Exception as error:
+        print(error)
 
 main()
