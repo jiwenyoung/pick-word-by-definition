@@ -86,10 +86,7 @@ class View:
                                     break
                         except:
                             pass
-            if char == "_":
-                print(f"\033[1;32m{char}\033[0m", end="")
-            else:
-                print(char, end="")
+            print(char, end="")
         print()
 
         return self
