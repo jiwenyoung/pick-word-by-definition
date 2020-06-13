@@ -8,6 +8,10 @@ class Exercise:
         self.view = View()
         self.done = set()
         self.wordfile = wordfile
+        self.score = {
+            "correct" : 0,
+            "wrong" : 0
+        }
 
     def header(self):
         self.view.clear()
@@ -38,8 +42,11 @@ class Exercise:
         while True:
             word = self.choice()
             if word != '':
-                exercise = Question(word)
-                exercise.interact()
+                exercise = Question(word,self.score)
+                if exercise.interact():
+                    self.score["correct"] += 1
+                else:
+                    self.score["wrong"] += 1
             else:
                 sys.exit(0)
 
@@ -55,7 +62,6 @@ def main():
         exercise = Exercise(wordfile)
         exercise.run()
     except Exception as error:
-        raise error
         print(error)
         pass
 

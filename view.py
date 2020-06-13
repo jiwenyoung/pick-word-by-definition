@@ -107,5 +107,8 @@ class View:
         print()
         return self
 
+    def infomation(self,text):
+        sys.stderr.write(f"\n\033[1;32m{text}\033[0m\n\n")
+
     def warning(self, text):
         sys.stderr.write(f"\n\033[1;31m{text}\033[0m\n\n")

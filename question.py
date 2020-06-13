@@ -3,12 +3,13 @@ from view import View
 from word import Word
 
 class Question:
-    def __init__(self, word):
+    def __init__(self, word, score):
         self.word = Word(word)
         self.question = self.word.define().option().output()
         self.symbols = ["A", "B", "C", "D"]
         self.view = View()
         self.isCorrect = False
+        self.score = score
 
     def cleanLog(self):
         # remove duplicated word in wrong.log
@@ -29,54 +30,70 @@ class Question:
             with open("errors.conf", 'w', encoding='utf-8') as file:
                 file.write(data)
 
+    def exit(self):
+        total = self.score["correct"] + self.score["wrong"]
+        correct = self.score["correct"]
+        wrong = self.score["wrong"]
+        self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
+        sys.exit(0)
+
     def interact(self):
-        self.view.sentence(self.question["definition"], 80)
-        self.view.options(self.symbols, self.question["options"])
+        try:
+            self.view.sentence(self.question["definition"], 80)
+            self.view.options(self.symbols, self.question["options"])
 
-        while True:
-            picked = input("Please input your choice: ")
+            while True:
+                picked = input("Please input your choice: ")
 
-            if picked.upper() == 'Q':
-                sys.exit(0)
+                if picked.upper() == 'Q':
+                    self.exit()
 
-            if picked.upper() not in self.symbols:
-                continue
+                if picked.upper() not in self.symbols:
+                    continue
 
-            choices = dict()
-            for symbol, value in zip(self.symbols, self.question["options"]):
-                choices[symbol] = value
+                choices = dict()
+                for symbol, value in zip(self.symbols, self.question["options"]):
+                    choices[symbol] = value
 
-            picked = choices[picked.upper()]
+                picked = choices[picked.upper()]
 
-            if self.word.evaluate(picked) == True:
-                self.isCorrect = True
-                self.view.evaluate(True)
-            else:
-                correct_symbol = ''
-                for index in choices:
-                    if choices[index] == self.question["word"]:
-                        correct_symbol = index
-                        break
-
-                self.view.evaluate(False, correct_symbol)
-
-                # write error word into wrong.log
-                with open('wrong.log', 'r+') as file:
-                    wrong_word_list = file.read()
-                    if "\n" in wrong_word_list:
-                        wrong_word_list = wrong_word_list.strip("\n")
-                        wrong_word_list = wrong_word_list.split("\n")
-                        wrong_word_list.append(self.question["word"])
-                        wrong_word_list = list(set(wrong_word_list))
-                    else:
-                        wrong_word_list = [self.question["word"]]
-
-                    for word in wrong_word_list:
-                        if word != '':
-                            file.write(f"{self.question['word']}\n")
+                if self.word.evaluate(picked) == True:
+                    self.isCorrect = True
+                    self.view.evaluate(True)
+                else:
+                    correct_symbol = ''
+                    for index in choices:
+                        if choices[index] == self.question["word"]:
+                            correct_symbol = index
                             break
-            break
 
-        if self.isCorrect == False:
-            self.cleanLog()
-            self.syncErrorConf()
+                    self.view.evaluate(False, correct_symbol)
+
+                    # write error word into wrong.log
+                    with open('wrong.log', 'r+') as file:
+                        wrong_word_list = file.read()
+                        if "\n" in wrong_word_list:
+                            wrong_word_list = wrong_word_list.strip("\n")
+                            wrong_word_list = wrong_word_list.split("\n")
+                            wrong_word_list.append(self.question["word"])
+                            wrong_word_list = list(set(wrong_word_list))
+                        else:
+                            wrong_word_list = [self.question["word"]]
+
+                        for word in wrong_word_list:
+                            if word != '':
+                                file.write(f"{self.question['word']}\n")
+                                break
+                break
+
+            if self.isCorrect == False:
+                self.cleanLog()
+                self.syncErrorConf()
+
+            return self.isCorrect
+
+        except KeyboardInterrupt as error:
+            self.exit()
+        except Exception as error:
+            raise error 
+                 
