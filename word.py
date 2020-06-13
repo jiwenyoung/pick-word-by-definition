@@ -2,6 +2,7 @@ import sqlite3 as sqlite
 import urllib.request
 import json
 import random
+import re
 
 class Word:
     def __init__(self, word):
@@ -34,6 +35,8 @@ class Word:
             with urllib.request.urlopen(request) as response:
                 result = json.load(response)
                 definition = result["definitions"][0]["definition"]
+                cleanr = re.compile('<.*?>')
+                definition = re.sub(cleanr, '', definition)
                 self.definition = definition
 
         # write pulled definition into database

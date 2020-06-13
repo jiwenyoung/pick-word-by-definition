@@ -22,7 +22,7 @@ class Configuration:
         if os.path.exists(filename):
             return False
         else:
-            with open(filename,'w') as file:
+            with open(filename,'w', encoding='utf-8') as file:
                 pass
             return True    
 
