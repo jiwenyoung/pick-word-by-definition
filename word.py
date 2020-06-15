@@ -25,19 +25,25 @@ class Word:
                 self.definition = definition[1]
 
         # If not exists in database, pull from api
-        if isWordInDatabase == False:
-            url = f"https://owlbot.info/api/v4/dictionary/{self.word}"
-            request = urllib.request.Request(url)
-            request.add_header(
-                "Authorization", "Token cbd6e12dbb6b45ca586e38b4a3f9a60120594ca4")
-            request.add_header(
-                'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36')
-            with urllib.request.urlopen(request) as response:
-                result = json.load(response)
-                definition = result["definitions"][0]["definition"]
-                cleanr = re.compile('<.*?>')
-                definition = re.sub(cleanr, '', definition)
-                self.definition = definition
+        def pull():
+            if isWordInDatabase == False:
+                url = f"https://owlbot.info/api/v4/dictionary/{self.word}"
+                request = urllib.request.Request(url)
+                request.add_header(
+                    "Authorization", "Token cbd6e12dbb6b45ca586e38b4a3f9a60120594ca4")
+                request.add_header(
+                    'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36')
+                with urllib.request.urlopen(request) as response:
+                    result = json.load(response)
+                    definition = result["definitions"][0]["definition"]
+                    cleanr = re.compile('<.*?>')
+                    definition = re.sub(cleanr, '', definition)
+                    self.definition = definition
+        try:
+            pull()
+        except Exception as error:
+            pull()
+            pass
 
         # write pulled definition into database
         if isWordInDatabase == False:
@@ -49,11 +55,15 @@ class Word:
         return self
 
     def option(self):
-        with open('words.conf',encoding='utf-8') as file:
+        with open('words.conf', encoding='utf-8') as file:
             wordlist = file.read()
             wordlist = wordlist.split("\n")
             wordlist = list(set(wordlist))
-            availabe = random.sample(wordlist,3)
+            availabe = random.sample(wordlist, 3)
+            if self.word in availabe:
+                availabe = random.sample(wordlist, 3)
+            if '' in availabe:
+                availabe = random.sample(wordlist, 3)
             self.options = availabe
             self.options.append(self.word)
             random.shuffle(self.options)
@@ -62,8 +72,8 @@ class Word:
     def output(self):
         question = {
             "word": self.word,
-            "definition" : self.definition,
-            "options" : self.options
+            "definition": self.definition,
+            "options": self.options
         }
         return question
 

@@ -4,13 +4,13 @@ from view import View
 from question import Question
 
 class Exercise:
-    def __init__(self,wordfile):
+    def __init__(self, wordfile):
         self.view = View()
         self.done = set()
         self.wordfile = wordfile
         self.score = {
-            "correct" : 0,
-            "wrong" : 0
+            "correct": 0,
+            "wrong": 0
         }
 
     def header(self):
@@ -42,7 +42,7 @@ class Exercise:
         while True:
             word = self.choice()
             if word != '':
-                exercise = Question(word,self.score)
+                exercise = Question(word, self.score)
                 if exercise.interact():
                     self.score["correct"] += 1
                 else:
@@ -51,18 +51,17 @@ class Exercise:
                 sys.exit(0)
 
 def main():
-    try:
-        wordfile = ''
-        if len(sys.argv) == 1:
-            wordfile = "words.conf"
-        else:
-            if sys.argv[1].lower() == 'wrong':
-                wordfile = "errors.conf"
+    wordfile = ''
+    if len(sys.argv) == 1:
+        wordfile = "words.conf"
+    else:
+        if sys.argv[1].lower() == 'wrong':
+            wordfile = "errors.conf"
 
-        exercise = Exercise(wordfile)
-        exercise.run()
+    try:
+        Exercise(wordfile).run()
     except Exception as error:
-        print(error)
+        Exercise(wordfile).run()
         pass
 
 main()
