@@ -1,4 +1,5 @@
 import sys
+import os
 from view import View
 from word import Word
 
@@ -35,6 +36,9 @@ class Question:
         correct = self.score["correct"]
         wrong = self.score["wrong"]
         self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
+        
+        os.remove('score.log')
+        os.remove('words.tmp')        
         sys.exit(0)
 
     def interact(self):

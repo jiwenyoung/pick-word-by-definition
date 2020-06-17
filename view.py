@@ -65,6 +65,7 @@ class View:
         print()
         print(f"\033[1;32m{text}\033[0m")
         print()
+        return self
 
     def sentence(self, text, width):
         break_index = 0

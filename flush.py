@@ -70,7 +70,7 @@ class Program:
 
         with open("words.conf",'w',encoding='utf-8') as file:
             for word in exists:
-                file.write(f"{word}\n")
+                file.write(f"{word}")
         
 
     def main(self):

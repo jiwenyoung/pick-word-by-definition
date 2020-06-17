@@ -55,15 +55,19 @@ class Word:
         return self
 
     def option(self):
-        with open('words.conf', encoding='utf-8') as file:
+        with open('words.tmp', encoding='utf-8') as file:
             wordlist = file.read()
             wordlist = wordlist.split("\n")
             wordlist = list(set(wordlist))
-            availabe = random.sample(wordlist, 3)
-            if self.word in availabe:
+            
+            availabe = []
+            while True:
                 availabe = random.sample(wordlist, 3)
-            if '' in availabe:
-                availabe = random.sample(wordlist, 3)
+                if '' in availabe:
+                    continue
+                if self.word not in availabe:
+                    break
+
             self.options = availabe
             self.options.append(self.word)
             random.shuffle(self.options)
