@@ -12,6 +12,9 @@ class Question:
         self.isCorrect = False
         self.score = score
 
+    def output(self):
+        return self.question
+
     def cleanLog(self):
         # remove duplicated word in wrong.log
         data = ''

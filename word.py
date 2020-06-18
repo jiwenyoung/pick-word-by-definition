@@ -42,7 +42,7 @@ class Word:
         try:
             pull()
         except Exception as error:
-            pull()
+            self.definition = None
             pass
 
         # write pulled definition into database
@@ -51,7 +51,6 @@ class Word:
                 sql = "insert into words (word,define) values (?,?)"
                 connection.execute(sql, (self.word, self.definition))
                 connection.commit()
-
         return self
 
     def option(self):

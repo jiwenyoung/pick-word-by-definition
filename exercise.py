@@ -23,7 +23,7 @@ class Exercise:
             wordlist = list(set(wordlist))
 
             if (len(wordlist) == len(self.done)):
-                sys.exit(0)
+                return None
             else:
                 word = ''
                 while True:
@@ -51,15 +51,23 @@ class Exercise:
     def run(self):
         while True:
             word = self.choice()
-            if word != '':
+            if word != '' and word != None:
                 self.do_score('sync')
                 self.do_score('read')
                 exercise = Question(word, self.score)
-                if exercise.interact():
-                    self.score["correct"] += 1
+                question = exercise.output()
+                if question["definition"] == None:
+                    continue
                 else:
-                    self.score["wrong"] += 1
+                    if exercise.interact():
+                        self.score["correct"] += 1
+                    else:
+                        self.score["wrong"] += 1
             else:
+                total = self.score["correct"] + self.score["wrong"]
+                correct = self.score["correct"]
+                wrong = self.score["wrong"]
+                self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
                 sys.exit(0)
 
 def main():
@@ -92,7 +100,7 @@ def main():
 
     #Startup
     try:
-        View().clear().header(80).title("Exercise")
+        View().clear().header(80).title(f"Exercise on {wordfile}")
         Exercise(wordfile).run()
     except Exception as error:
         Exercise(wordfile).run()

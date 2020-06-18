@@ -2,6 +2,7 @@ import threading
 import urllib.request
 import json
 import re
+import os
 import sqlite3 as sqlite
 from queue import Queue
 
@@ -12,6 +13,18 @@ class Flush(threading.Thread):
         threading.Thread.__init__(self)
         self.word = word
         self.definition = ''
+
+    def exists(self):
+        with sqlite.connect('definition.db') as connection:
+            cursor = connection.cursor()
+            sql = "select count(*) from words where word=?"
+            cursor.execute(sql,(self.word,))
+            result = cursor.fetchone()
+            result = result[0]
+            if result == 0:
+                return False
+            else:
+                return True
 
     def pull(self):
         try:
@@ -54,12 +67,13 @@ class Flush(threading.Thread):
         return self
 
     def run(self):
-        self.pull().save()
+        if self.exists() == False:
+            self.pull().save()
 
 class Program:
-    def remove(self,result):
+    def remove(self,result,source):
         words = []
-        with open('words.conf', encoding='utf-8') as file:
+        with open(source, encoding='utf-8') as file:
             for word in file:
                 words.append(word)
 
@@ -68,27 +82,27 @@ class Program:
             if word not in result:
                 exists.append(word)
 
-        with open("words.conf",'w',encoding='utf-8') as file:
+        with open(source,'w',encoding='utf-8') as file:
             for word in exists:
                 file.write(f"{word}")
         
-
     def main(self):
-        with open('words.conf', encoding='utf-8') as file:
-            tasks = []
-            for word in file:
-                task = Flush(word)
-                task.start()
-                tasks.append(task)
+        sources = os.listdir('source')
+        for source in sources:
+            with open(f'source/{source}', encoding='utf-8') as file:
+                tasks = []
+                for word in file:
+                    task = Flush(word)
+                    task.start()
+                    tasks.append(task)
 
-            for task in tasks:
-                task.join()
+                for task in tasks:
+                    task.join()
 
-            result = []
-            #print("ERRORS***************************")
-            for i in range(errors.qsize()):
-                result.append( errors.get() )
+                result = []
+                for i in range(errors.qsize()):
+                    result.append( errors.get() )
 
-            self.remove(result)
+                self.remove(result,f'source/{source}')
 
 Program().main()
