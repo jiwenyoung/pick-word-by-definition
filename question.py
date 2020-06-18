@@ -41,7 +41,8 @@ class Question:
         self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
         
         os.remove('score.log')
-        os.remove('words.tmp')        
+        os.remove('words.tmp')
+        os.remove('wordpool.tmp')        
         sys.exit(0)
 
     def interact(self):

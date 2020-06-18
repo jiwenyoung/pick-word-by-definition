@@ -74,12 +74,20 @@ def main():
     #Decide from which file words will be read
     wordfile = ''
     if len(sys.argv) == 1:
-        sources = os.listdir('source')
-        sources.sort(key=lambda fn : os.path.getmtime(f'source/{fn}'))
-        wordfile = f"source/{sources[len(sources) - 1]}"
+        with open("wordpool.tmp","w",encoding="utf-8") as file:
+            sources = os.listdir("source")
+            for source in sources:
+                with open(f"source/{source}",encoding='utf-8') as src:
+                    for word in src:
+                        file.write(f"{word}\n")
+        wordfile = 'wordpool.tmp'
     else:
         if sys.argv[1].lower() == 'wrong':
             wordfile = "errors.conf"
+        elif sys.argv[1].lower() == 'new':
+            sources = os.listdir('source')
+            sources.sort(key=lambda fn : os.path.getmtime(f'source/{fn}'))
+            wordfile = f"source/{sources[len(sources) - 1]}"
         else:
             if sys.argv[1].endswith(".src"):
                 wordfile = f"source/{sys.argv[1].lower()}"
