@@ -40,14 +40,18 @@ class Question:
         wrong = self.score["wrong"]
         self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
         
-        os.remove('score.log')
-        os.remove('words.tmp')
-        os.remove('wordpool.tmp')        
+        if os.path.exists('score.log'):
+            os.remove('score.log')
+        if os.path.exists("words.tmp"):
+            os.remove('words.tmp')
+        if os.path.exists('wordpool.tmp'):
+            os.remove('wordpool.tmp')        
         sys.exit(0)
 
     def interact(self):
         try:
-            self.view.sentence(self.question["definition"], 80)
+            for element in self.question["definition"]:
+                self.view.sentence(element, 80)
             self.view.options(self.symbols, self.question["options"])
 
             while True:

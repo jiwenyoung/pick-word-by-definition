@@ -22,7 +22,12 @@ class Word:
                 isWordInDatabase = False
             else:
                 isWordInDatabase = True
-                self.definition = definition[1]
+                definition = definition[1]
+                if "|" in definition:
+                    definition = definition.split("|")
+                else:
+                    definition = [ definition ]
+                self.definition = definition
 
         # If not exists in database, pull from api
         def pull():
@@ -35,21 +40,35 @@ class Word:
                     'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36')
                 with urllib.request.urlopen(request) as response:
                     result = json.load(response)
-                    definition = result["definitions"][0]["definition"]
+
+                    definition = []
+                    for item in result["definitions"]:
+                        definition.append(f"[{item['type'].upper()}]@{item['definition']}")
+                    
                     cleanr = re.compile('<.*?>')
-                    definition = re.sub(cleanr, '', definition)
+                    for key,item in enumerate(definition):
+                        definition[key] = re.sub(cleanr, '', item)
                     self.definition = definition
         try:
             pull()
         except Exception as error:
+            raise error
             self.definition = None
             pass
 
         # write pulled definition into database
-        if isWordInDatabase == False:
+        if isWordInDatabase == False and self.definition != None:
             with sqlite.connect('definition.db') as connection:
+                definition = ''
+                if len(self.definition) == 1:
+                    definition = self.definition[0]
+                else:
+                    for item in self.definition:
+                        definition += f"{item}|"
+                    definition = definition.strip("|")
+
                 sql = "insert into words (word,define) values (?,?)"
-                connection.execute(sql, (self.word, self.definition))
+                connection.execute(sql, (self.word,definition))
                 connection.commit()
         return self
 

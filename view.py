@@ -69,7 +69,11 @@ class View:
 
     def sentence(self, text, width):
         break_index = 0
-        print(f"\033[1;32m● \033[0m", end="")
+        data = text.split("@")
+        wordtype = data[0]
+        text = data[1]
+        print(f"\033[1;32m{wordtype} \033[0m", end="")
+
         for index, char in enumerate(text):
             if index == break_index and index != 0:
                 print()

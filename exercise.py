@@ -111,7 +111,8 @@ def main():
         View().clear().header(80).title(f"Exercise on {wordfile}")
         Exercise(wordfile).run()
     except Exception as error:
-        Exercise(wordfile).run()
+        raise error
+        #Exercise(wordfile).run()
         pass
 
 main()
