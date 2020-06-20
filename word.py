@@ -7,7 +7,7 @@ import re
 class Word:
     def __init__(self, word):
         self.word = word
-        self.definitions = ''
+        self.definitions = []
         self.options = []
 
     def define(self):
@@ -41,14 +41,14 @@ class Word:
                 with urllib.request.urlopen(request) as response:
                     result = json.load(response)
 
+                    cleanr = re.compile('<.*?>')
+
                     definition = []
                     for item in result["definitions"]:
+                        item['definition'] = re.sub(cleanr, '', item['definition'])
                         definition.append(f"[{item['type'].upper()}]@{item['definition']}")
-                    
-                    cleanr = re.compile('<.*?>')
-                    for key,item in enumerate(definition):
-                        definition[key] = re.sub(cleanr, '', item)
                     self.definition = definition
+
         try:
             pull()
         except Exception as error:

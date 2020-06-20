@@ -83,7 +83,11 @@ def main():
         wordfile = 'wordpool.tmp'
     else:
         if sys.argv[1].lower() == 'wrong':
-            wordfile = "errors.conf"
+            with open('errors.tmp','w',encoding='utf-8') as file:
+                for filename in os.listdir('wrong'):
+                    wrongword = filename.strip('.txt')
+                    file.write(f"{wrongword}\n")
+            wordfile = "errors.tmp"
         elif sys.argv[1].lower() == 'new':
             sources = os.listdir('source')
             sources.sort(key=lambda fn : os.path.getmtime(f'source/{fn}'))
@@ -111,8 +115,8 @@ def main():
         View().clear().header(80).title(f"Exercise on {wordfile}")
         Exercise(wordfile).run()
     except Exception as error:
-        raise error
-        #Exercise(wordfile).run()
+        #raise error
+        Exercise(wordfile).run()
         pass
 
 main()
