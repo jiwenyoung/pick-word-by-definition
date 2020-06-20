@@ -1,3 +1,0 @@
-pry
-
-[VERB]@enquire too inquisitively into a person's private affairs.

@@ -4,15 +4,15 @@ from view import View
 from word import Word
 from wrong import Wrong
 
-
 class Question:
-    def __init__(self, word, score):
+    def __init__(self, word, score, remove):
         self.word = Word(word)
         self.question = self.word.define().option().output()
         self.symbols = ["A", "B", "C", "D"]
         self.view = View()
         self.isCorrect = False
         self.score = score
+        self.remove = remove
 
     def output(self):
         return self.question
@@ -32,7 +32,7 @@ class Question:
             os.remove('wordpool.tmp')
         if os.path.exists('errors.tmp'):
             os.remove('errors.tmp')
-            
+
         sys.exit(0)
 
     def interact(self):
@@ -59,6 +59,13 @@ class Question:
                 if self.word.evaluate(picked) == True:
                     self.isCorrect = True
                     self.view.evaluate(True)
+
+                    if self.remove == True:
+                        wrong = Wrong(
+                            self.question['word'], 
+                            self.question['definition']
+                        ) 
+                        wrong.remove()
                 else:
                     correct_symbol = ''
                     for index in choices:
@@ -74,6 +81,7 @@ class Question:
                         self.question['definition']
                     ) 
                     wrong.record()
+
                 break
 
             return self.isCorrect

@@ -3,11 +3,12 @@ import urllib.request
 import json
 import random
 import re
+import os
 
 class Word:
     def __init__(self, word):
         self.word = word
-        self.definitions = []
+        self.definition = []
         self.options = []
 
     def define(self):
@@ -31,33 +32,28 @@ class Word:
 
         # If not exists in database, pull from api
         def pull():
-            if isWordInDatabase == False:
-                url = f"https://owlbot.info/api/v4/dictionary/{self.word}"
-                request = urllib.request.Request(url)
-                request.add_header(
-                    "Authorization", "Token cbd6e12dbb6b45ca586e38b4a3f9a60120594ca4")
-                request.add_header(
-                    'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36')
-                with urllib.request.urlopen(request) as response:
-                    result = json.load(response)
+            url = f"https://owlbot.info/api/v4/dictionary/{self.word}"
+            request = urllib.request.Request(url)
+            request.add_header(
+                "Authorization", "Token cbd6e12dbb6b45ca586e38b4a3f9a60120594ca4")
+            request.add_header(
+                'User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36')
+            with urllib.request.urlopen(request) as response:
+                result = json.load(response)
 
-                    cleanr = re.compile('<.*?>')
+                cleanr = re.compile('<.*?>')
 
-                    definition = []
-                    for item in result["definitions"]:
-                        item['definition'] = re.sub(cleanr, '', item['definition'])
-                        definition.append(f"[{item['type'].upper()}]@{item['definition']}")
-                    self.definition = definition
+                definition = []
+                for item in result["definitions"]:
+                    item['definition'] = re.sub(cleanr, '', item['definition'])
+                    definition.append(f"[{item['type'].upper()}]@{item['definition']}")
+                self.definition = definition
 
-        try:
+        if isWordInDatabase == False:
             pull()
-        except Exception as error:
-            raise error
-            self.definition = None
-            pass
 
         # write pulled definition into database
-        if isWordInDatabase == False and self.definition != None:
+        if isWordInDatabase == False:
             with sqlite.connect('definition.db') as connection:
                 definition = ''
                 if len(self.definition) == 1:
@@ -73,14 +69,18 @@ class Word:
         return self
 
     def option(self):
-        with open('words.tmp', encoding='utf-8') as file:
-            wordlist = file.read()
-            wordlist = wordlist.split("\n")
-            wordlist = list(set(wordlist))
-            
+        pool = set()
+        sources = os.listdir('source')
+        for source in sources:
+            with open(f"source/{source}",encoding='utf-8') as file:
+                for word in file:
+                    word = word.strip("")
+                    word = word.strip("\n")
+                    pool.add(word)
+
             availabe = []
             while True:
-                availabe = random.sample(wordlist, 3)
+                availabe = random.sample(pool, 3)
                 if '' in availabe:
                     continue
                 if self.word not in availabe:
@@ -89,7 +89,7 @@ class Word:
             self.options = availabe
             self.options.append(self.word)
             random.shuffle(self.options)
-            return self
+        return self
 
     def output(self):
         question = {

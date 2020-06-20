@@ -1,3 +1,4 @@
+import urllib
 import random
 import sys
 import os
@@ -9,10 +10,15 @@ class Exercise:
         self.view = View()
         self.done = set()
         self.wordfile = wordfile
+        self.remove = False
         self.score = {
             "correct": 0,
             "wrong": 0
         }
+
+    def setRemove(self,remove):
+        self.remove = remove
+        return self
 
     def choice(self):
         with open(self.wordfile, encoding='utf-8') as file:
@@ -20,6 +26,11 @@ class Exercise:
             if wordlist == '':
                 sys.exit(0)
             wordlist = wordlist.split("\n")
+            
+            for item in wordlist:
+                if item == '':
+                    wordlist.remove(item)
+
             wordlist = list(set(wordlist))
 
             if (len(wordlist) == len(self.done)):
@@ -49,74 +60,98 @@ class Exercise:
                         self.score['wrong'] = int(pair[1])
 
     def run(self):
+        errors = []
+        word = ''
         while True:
-            word = self.choice()
-            if word != '' and word != None:
-                self.do_score('sync')
-                self.do_score('read')
-                exercise = Question(word, self.score)
-                question = exercise.output()
-                if question["definition"] == None:
-                    continue
-                else:
-                    if exercise.interact():
-                        self.score["correct"] += 1
+            try:
+                word = self.choice()
+                if word not in errors:
+                    exercise = object()
+                    if word != '' and word != None:
+                        self.do_score('sync')
+                        self.do_score('read')
+
+                        exercise = Question(word, self.score, self.remove)
+                        question = exercise.output()
+                        if exercise.interact():
+                            self.score["correct"] += 1
+                        else:
+                            self.score["wrong"] += 1
                     else:
-                        self.score["wrong"] += 1
-            else:
-                total = self.score["correct"] + self.score["wrong"]
-                correct = self.score["correct"]
-                wrong = self.score["wrong"]
-                self.view.infomation(f"Total {total} questions, correct {correct}, wrong {wrong}")
-                sys.exit(0)
+                        exercise = Question('test', self.score, self.remove)
+                        exercise.exit()
+                else:
+                    continue
+            except urllib.error.HTTPError as error:
+                errors.append(word)
+                continue
+            except Exception as error:
+                raise error
 
-def main():
-    #Decide from which file words will be read
-    wordfile = ''
-    if len(sys.argv) == 1:
-        with open("wordpool.tmp","w",encoding="utf-8") as file:
-            sources = os.listdir("source")
-            for source in sources:
-                with open(f"source/{source}",encoding='utf-8') as src:
-                    for word in src:
-                        file.write(f"{word}\n")
-        wordfile = 'wordpool.tmp'
-    else:
-        if sys.argv[1].lower() == 'wrong':
-            with open('errors.tmp','w',encoding='utf-8') as file:
-                for filename in os.listdir('wrong'):
-                    wrongword = filename.strip('.txt')
-                    file.write(f"{wrongword}\n")
-            wordfile = "errors.tmp"
-        elif sys.argv[1].lower() == 'new':
-            sources = os.listdir('source')
-            sources.sort(key=lambda fn : os.path.getmtime(f'source/{fn}'))
-            wordfile = f"source/{sources[len(sources) - 1]}"
+
+class Util:
+    def clean():
+        """Clean temp files"""
+        if os.path.exists('score.log'):
+            os.remove('score.log')
+        if os.path.exists("words.tmp"):
+            os.remove('words.tmp')
+        if os.path.exists('wordpool.tmp'):
+            os.remove('wordpool.tmp')
+        if os.path.exists('errors.tmp'):
+            os.remove('errors.tmp')
+        sys.exit(0)
+
+    def wordfile(self,argv):
+        """Decide from which file words will be read"""
+        if_remove = False
+        wordfile = ''
+        if len(argv) == 1:
+            with open("wordpool.tmp","w",encoding="utf-8") as file:
+                sources = os.listdir("source")
+                for source in sources:
+                    with open(f"source/{source}",encoding='utf-8') as src:
+                        for word in src:
+                            file.write(f"{word}\n")
+            wordfile = 'wordpool.tmp'
         else:
-            if sys.argv[1].endswith(".src"):
-                wordfile = f"source/{sys.argv[1].lower()}"
-            else:
-                wordfile = f"source/{sys.argv[1].lower()}.src"
+            if argv[1].lower() == 'wrong':
+                with open('errors.tmp','w',encoding='utf-8') as file:
+                    for filename in os.listdir('wrong'):
+                        wrongword = filename.strip('.txt')
+                        file.write(f"{wrongword}\n")
+                wordfile = "errors.tmp"
 
-    #write words into tmp file
-    words = []
-    with open(wordfile, encoding='utf-8') as file:
-        for line in file:
-            word = line.strip(" ")
-            word = word.strip("\n")
-            words.append(word)
-    with open('words.tmp','w',encoding='utf-8') as file:
-        for word in words:
-            file.write(f"{word}\n")
-    del words    
+                if len(argv) == 3:
+                    if argv[2].lower() == 'remove':
+                        if_remove = True
+            
+            elif argv[1].lower() == 'new':
+                sources = os.listdir('source')
+                sources.sort(key=lambda fn : os.path.getmtime(f'source/{fn}'))
+                wordfile = f"source/{sources[len(sources) - 1]}"
+            else:
+                if argv[1].endswith(".src"):
+                    wordfile = f"source/{argv[1].lower()}"
+                else:
+                    wordfile = f"source/{argv[1].lower()}.src"
+        return (wordfile,if_remove)
+
+#Main entry
+def main():
+    #if remove corrected wrong word file
+    if_remove = False
+
+    util = Util()
+    wordfile,if_remove = util.wordfile(sys.argv)
 
     #Startup
     try:
         View().clear().header(80).title(f"Exercise on {wordfile}")
-        Exercise(wordfile).run()
+        Exercise(wordfile).setRemove(if_remove).run()
     except Exception as error:
-        #raise error
-        Exercise(wordfile).run()
+        print(error)
+        util.clean()
         pass
 
 main()

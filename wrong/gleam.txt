@@ -1,4 +1,0 @@
-gleam
-
-[VERB]@shine brightly, especially with reflected light.
-[NOUN]@a faint or brief light, especially one reflected from something.
