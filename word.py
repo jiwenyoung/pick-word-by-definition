@@ -46,7 +46,10 @@ class Word:
                 definition = []
                 for item in result["definitions"]:
                     item['definition'] = re.sub(cleanr, '', item['definition'])
-                    definition.append(f"[{item['type'].upper()}]@{item['definition']}")
+                    if item['type'] != None:
+                        definition.append(f"[{item['type'].upper()}]@{item['definition']}")
+                    else:
+                        definition.append(f"[]@{item['definition']}")
                 self.definition = definition
 
         if isWordInDatabase == False:
@@ -89,6 +92,7 @@ class Word:
             self.options = availabe
             self.options.append(self.word)
             random.shuffle(self.options)
+            self.options.append('I donot know')
         return self
 
     def output(self):

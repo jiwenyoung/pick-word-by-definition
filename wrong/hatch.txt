@@ -1,0 +1,3 @@
+hatch
+
+[NOUN] a small opening in a floor, wall, or roof allowing access from one area to another.

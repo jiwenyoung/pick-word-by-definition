@@ -10,7 +10,9 @@ class Exercise:
         self.view = View()
         self.done = set()
         self.wordfile = wordfile
+        self.wordlist = []
         self.remove = False
+        self.number = 1
         self.score = {
             "correct": 0,
             "wrong": 0
@@ -21,28 +23,30 @@ class Exercise:
         return self
 
     def choice(self):
-        with open(self.wordfile, encoding='utf-8') as file:
-            wordlist = file.read()
-            if wordlist == '':
-                sys.exit(0)
-            wordlist = wordlist.split("\n")
-            
-            for item in wordlist:
-                if item == '':
-                    wordlist.remove(item)
+        if len(self.wordlist) == 0:
+            with open(self.wordfile, encoding='utf-8') as file:
+                wordlist = file.read()
+                if wordlist == '':
+                    sys.exit(0)
+                wordlist = wordlist.split("\n")
+                
+                for item in wordlist:
+                    if item == '':
+                        wordlist.remove(item)
 
-            wordlist = list(set(wordlist))
+                self.wordlist = list(set(wordlist))
 
-            if (len(wordlist) == len(self.done)):
-                return None
-            else:
-                word = ''
-                while True:
-                    word = random.choice(wordlist)
-                    if word not in self.done:
-                        break
-                self.done.add(word)
-                return word
+        if len(self.wordlist) == 1:
+            return None
+        else:
+            word = ''
+            while True:
+                word = random.choice(self.wordlist)
+                self.wordlist.remove(word)
+                if word not in self.done:
+                    break
+            self.done.add(word)
+            return word
 
     def do_score(self,operation):
         if operation == 'sync':
@@ -71,6 +75,8 @@ class Exercise:
                         self.do_score('sync')
                         self.do_score('read')
 
+                        print(f"#{self.number}")
+                        self.number += 1
                         exercise = Question(word, self.score, self.remove)
                         question = exercise.output()
                         if exercise.interact():
@@ -84,13 +90,14 @@ class Exercise:
                     continue
             except urllib.error.HTTPError as error:
                 errors.append(word)
+                print(error)
                 continue
             except Exception as error:
                 raise error
 
 
 class Util:
-    def clean():
+    def clean(self):
         """Clean temp files"""
         if os.path.exists('score.log'):
             os.remove('score.log')
@@ -141,7 +148,6 @@ class Util:
 def main():
     #if remove corrected wrong word file
     if_remove = False
-
     util = Util()
     wordfile,if_remove = util.wordfile(sys.argv)
 
@@ -150,6 +156,7 @@ def main():
         View().clear().header(80).title(f"Exercise on {wordfile}")
         Exercise(wordfile).setRemove(if_remove).run()
     except Exception as error:
+        raise error
         print(error)
         util.clean()
         pass

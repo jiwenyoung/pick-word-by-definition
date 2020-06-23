@@ -8,7 +8,7 @@ class Question:
     def __init__(self, word, score, remove):
         self.word = Word(word)
         self.question = self.word.define().option().output()
-        self.symbols = ["A", "B", "C", "D"]
+        self.symbols = ["A", "B", "C", "D","E"]
         self.view = View()
         self.isCorrect = False
         self.score = score
@@ -43,6 +43,7 @@ class Question:
 
             while True:
                 picked = input("Please input your choice: ")
+                #picked = 'A'
 
                 if picked.upper() == 'Q':
                     self.exit()
