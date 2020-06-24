@@ -158,6 +158,7 @@ def main():
     except Exception as error:
         raise error
         print(error)
+        print()
         util.clean()
         pass
 
