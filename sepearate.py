@@ -27,7 +27,6 @@ class Seperate:
 
         with open('tmp/words.conf','w',encoding='utf-8') as file:
             files = os.listdir('source-bak')
-            print(files)
             for item in files:
                 with open(f'source-bak/{item}',encoding='utf-8') as source:
                     for line in source:

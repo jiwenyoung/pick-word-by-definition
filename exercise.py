@@ -91,10 +91,15 @@ class Exercise:
             except urllib.error.HTTPError as error:
                 errors.append(word)
                 print(error)
+                print()
+                continue
+            except IOError as error:    
+                errors.append(word)
+                print(error)
+                print()
                 continue
             except Exception as error:
                 raise error
-
 
 class Util:
     def clean(self):

@@ -84,6 +84,19 @@ class Word:
             availabe = []
             while True:
                 availabe = random.sample(pool, 3)
+                availabe = list(set(availabe))
+                if len(availabe) < 3:
+                    substract = 3 - len(availabe)
+                    i = 1
+                    while True:
+                        word = random.sample(pool,1)[0]
+                        if word not in availabe:
+                            availabe.append(word)
+                            i = i + 1
+
+                        if i == substract:
+                            break
+
                 if '' in availabe:
                     continue
                 if self.word not in availabe:
