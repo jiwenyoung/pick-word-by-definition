@@ -1,0 +1,5 @@
+volatile
+
+[ADJECTIVE] (of a computer's memory) retaining data only as long as there is a power supply connected.
+[ADJECTIVE] liable to change rapidly and unpredictably, especially for the worse.
+[ADJECTIVE] (of a substance) easily evaporated at normal temperatures.

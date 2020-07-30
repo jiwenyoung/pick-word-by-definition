@@ -1,0 +1,4 @@
+tether
+
+[VERB] tie (an animal) with a rope or chain so as to restrict its movement.
+[VERB] use (a smartphone) in order to connect a computer or other device to the Internet.

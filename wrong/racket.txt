@@ -1,0 +1,6 @@
+racket
+
+[NOUN] a bat with a round or oval frame strung with catgut, nylon, etc., used especially in tennis, badminton, and squash.
+[NOUN] a loud unpleasant noise; a din.
+[VERB] make or move with a loud unpleasant noise.
+[VERB] enjoy oneself socially; go in pursuit of pleasure or entertainment.

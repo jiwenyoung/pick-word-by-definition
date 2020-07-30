@@ -1,0 +1,3 @@
+celery
+
+[NOUN] a cultivated plant of the parsley family, with closely packed succulent leaf stalks which are used as a salad or cooked vegetable.
