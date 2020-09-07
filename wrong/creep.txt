@@ -1,0 +1,4 @@
+creep
+
+[VERB] move slowly and carefully in order to avoid being heard or noticed.
+[VERB] (of a negative characteristic or fact) occur or develop gradually and almost imperceptibly.
