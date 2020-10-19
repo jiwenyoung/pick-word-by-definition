@@ -1,0 +1,6 @@
+gauge
+
+[NOUN] the thickness, size, or capacity of something, especially as a standard measure, in particular:
+[VERB] estimate or determine the amount, level, or volume of.
+[VERB] measure the dimensions of (an object) with a gauge.
+[NOUN] an instrument that measures and gives a visual display of the amount, level, or contents of something.
